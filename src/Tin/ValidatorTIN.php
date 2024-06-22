@@ -7,15 +7,15 @@
 
 declare(strict_types=1);
 
-namespace PH7\Eu\Vat;
+namespace PH7\Eu\Tin;
 
-use PH7\Eu\Vat\Provider\Providable;
+use PH7\Eu\Tin\Provider\Providable;
 use stdClass;
 
-class Validator implements Validatable
+class ValidatorTIN implements Validatable
 {
     /** @var int|string */
-    private $sVatNumber;
+    private $sTinNumber;
 
     /** @var string */
     private $sCountryCode;
@@ -24,43 +24,44 @@ class Validator implements Validatable
     private $oResponse;
 
     /**
-     * @param Providable $oProvider The API that checks the VAT no. and retrieve the VAT registration's details.
-     * @param int|string $sVatNumber The VAT number.
+     * @param Providable $oProvider The API that checks the TIN no. 
+     * @param int|string $sTinNumber The TIN number.
      * @param string $sCountryCode The country code.
      */
-    public function __construct(Providable $oProvider, $sVatNumber, string $sCountryCode)
+    public function __construct(Providable $oProvider, $sTinNumber, string $sCountryCode)
     {
-        $this->sVatNumber = $sVatNumber;
+        $this->sTinNumber = $sTinNumber;
         $this->sCountryCode = $sCountryCode;
 
         $this->sanitize();
-        $this->oResponse = $oProvider->getResource($this->sVatNumber, $this->sCountryCode);
+        $this->oResponse = $oProvider->getResource($this->sTinNumber, $this->sCountryCode);
     }
+
 
     public function all(): string
     {
         return json_encode($this->oResponse);
     }
-    
+
     /**
-     * Check if the VAT number is valid or not
+     * Check if the TIN number is valid or not
      *
      * @return bool
      */
     public function check(): bool
     {
-        return (bool)$this->oResponse->valid;
+        return ($this->checkStructure() and $this->checkSyntax());
     }
 
-    public function getName(): string
+    public function checkStructure(): bool
     {
-        return $this->oResponse->name ?? '';
-    }
+        return (bool)$this->oResponse->validStructure;
+    }    
 
-    public function getAddress(): string
+    public function checkSyntax(): bool
     {
-        return $this->cleanAddress($this->oResponse->address) ?? '';
-    }
+        return (bool)$this->oResponse->validSyntax;
+    }      
 
     public function getRequestDate(): string
     {
@@ -72,20 +73,16 @@ class Validator implements Validatable
         return $this->oResponse->countryCode ?? '';
     }
 
-    public function getVatNumber(): string
+    public function getTinNumber(): string
     {
-        return $this->oResponse->vatNumber ?? '';
+        return $this->oResponse->tinNumber ?? '';
     }
 
     public function sanitize(): void
     {
         $aSearch = [$this->sCountryCode, '-', '_', '.', ',', ' '];
-        $this->sVatNumber = trim(str_replace($aSearch, '', $this->sVatNumber));
+        $this->sTinNumber = trim(str_replace($aSearch, '', $this->sTinNumber));
         $this->sCountryCode = strtoupper($this->sCountryCode);
     }
 
-    protected function cleanAddress(string $sString): string
-    {
-        return trim(str_replace(["\n", "\r\n"], ', ', $sString), ', ');
-    }
 }

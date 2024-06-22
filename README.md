@@ -50,9 +50,9 @@ require 'src/autoloader.php';
 
 ```php
 use PH7\Eu\Vat\Validator;
-use PH7\Eu\Vat\Provider\Europa;
+use PH7\Eu\Vat\Provider\EuropaVAT;
 
-$oVatValidator = new Validator(new Europa, '0472429986', 'BE');
+$oVatValidator = new Validator(new EuropaVAT, '0472429986', 'BE');
 
 if ($oVatValidator->check()) {
     $sRequestDate = $oVatValidator->getRequestDate();
