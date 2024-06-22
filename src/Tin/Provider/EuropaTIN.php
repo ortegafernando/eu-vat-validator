@@ -65,7 +65,7 @@ class EuropaTIN implements Providable
                 'countryCode' => strtoupper($sCountryCode),
                 'tinNumber' => $sTinNumber
             ];
-            return $this->oClient->checkTin($aDetails);
+            return $this->oClient->checkVat($aDetails);
         } catch (SoapFault $oExcept) {
             throw new Exception(
                 sprintf(self::IMPOSSIBLE_RETRIEVE_DATA_MESSAGE, $oExcept->faultstring)
