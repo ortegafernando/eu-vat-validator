@@ -27,13 +27,14 @@ class Validator implements Validatable
      * @param Providable $oProvider The API that checks the VAT no. and retrieve the VAT registration's details.
      * @param int|string $sVatNumber The VAT number.
      * @param string $sCountryCode The country code.
+     * @param boolean $strict Strict sanitize version, not change anything in VAT number
      */
-    public function __construct(Providable $oProvider, $sVatNumber, string $sCountryCode)
+    public function __construct(Providable $oProvider, $sVatNumber, string $sCountryCode, bool $strict = false)
     {
         $this->sVatNumber = $sVatNumber;
         $this->sCountryCode = $sCountryCode;
 
-        $this->sanitize();
+        $this->sanitize($strict);
         $this->oResponse = $oProvider->getResource($this->sVatNumber, $this->sCountryCode);
     }
 
@@ -77,10 +78,12 @@ class Validator implements Validatable
         return $this->oResponse->vatNumber ?? '';
     }
 
-    public function sanitize(): void
+    public function sanitize(bool $strict): void
     {
-        $aSearch = [$this->sCountryCode, '-', '_', '.', ',', ' '];
-        $this->sVatNumber = trim(str_replace($aSearch, '', $this->sVatNumber));
+        if (!$strict) {
+            $aSearch = [$this->sCountryCode, '-', '_', '.', ',', ' '];
+            $this->sVatNumber = trim(str_replace($aSearch, '', $this->sVatNumber));
+        }
         $this->sCountryCode = strtoupper($this->sCountryCode);
     }
 
