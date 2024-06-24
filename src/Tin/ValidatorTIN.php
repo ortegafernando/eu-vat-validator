@@ -27,13 +27,14 @@ class ValidatorTIN implements Validatable
      * @param Providable $oProvider The API that checks the TIN no. 
      * @param int|string $sTinNumber The TIN number.
      * @param string $sCountryCode The country code.
+    * @param boolean $strict Strict sanitize version, not change anything in TIN number
      */
-    public function __construct(Providable $oProvider, $sTinNumber, string $sCountryCode)
+    public function __construct(Providable $oProvider, $sTinNumber, string $sCountryCode, bool $strict = false)
     {
         $this->sTinNumber = $sTinNumber;
         $this->sCountryCode = $sCountryCode;
 
-        $this->sanitize();
+        $this->sanitize($strict);
         $this->oResponse = $oProvider->getResource($this->sTinNumber, $this->sCountryCode);
     }
 
@@ -78,11 +79,13 @@ class ValidatorTIN implements Validatable
         return $this->oResponse->tinNumber ?? '';
     }
 
-    public function sanitize(): void
+    public function sanitize(bool $strict): void
     {
-        $aSearch = [$this->sCountryCode, '-', '_', '.', ',', ' '];
-        $this->sTinNumber = trim(str_replace($aSearch, '', $this->sTinNumber));
+        if (!$strict) {
+            $aSearch = [$this->sCountryCode, '-', '_', '.', ',', ' '];
+            $this->sTinNumber = trim(str_replace($aSearch, '', $this->sTinNumber));
+        }
         $this->sCountryCode = strtoupper($this->sCountryCode);
-    }
+    }    
 
 }
