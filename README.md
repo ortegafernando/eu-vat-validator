@@ -1,17 +1,17 @@
-# EU VAT Number Validator
+# EU VAT and TIN Number Validator
 
-A simple and clean PHP class that validates EU VAT numbers against the central ec.europa.eu database (using the official europa API).
+A simple and clean PHP class that validates EU VAT and TIN numbers against the central ec.europa.eu database (using the official europa API).
 
 ![EU VATIN validator; EU Flag](eu-flag.svg)
 
 
 ## The Problem
 
-Validate VAT numbers might be difficult and if you use a validation pattern to check if the format is valid, you are never sure if the VAT registration number is still valid.
+Validate VAT and TIN numbers might be difficult and if you use a validation pattern to check if the format is valid, you are never sure if the VAT registration number is still valid.
 
 ## The Solution
 
-This [PHP VAT validator library](https://github.com/pH-7/eu-vat-validator) uses real-time data feeds from individual EU member states' VAT systems so you are sure of the validity of the number and avoid fraud with expired or wrong VAT numbers.
+This [PHP VAT validator library](https://github.com/pH-7/eu-vat-validator) uses real-time data feeds from individual EU member states' VAT and TIN systems so you are sure of the validity of the number and avoid fraud with expired or wrong VAT numbers.
 
 For example, this kind of validation can be very useful on online payment forms.
 
@@ -72,8 +72,19 @@ if ($oVatValidator->check()) {
 
 ## Optimization (Suggestion)
 
-Depending of the use of this library, it could be handy to cache the result specifically for each specified VAT number.
+Depending of the use of this library, it could be handy to cache the result specifically for each specified VAT or TIN number.
 
+## Strict mode
+
+By default this librery clean VAT or TIN numbers before checking them (it cleans by deleting from VAT or TIN numbers: country Code and these special characters: '-', '_', '.', ',', ' ').
+
+If you don't want, you can check numbers in strict mode, just by calling check function with option value TRUE (default value is FALSE). In the above example, you only need to change this line:
+```php
+if ($oVatValidator->check(true)) {
+```
+```php
+if ($oVatValidator->check(strict: true)) {
+```
 
 ## Requirements
 
