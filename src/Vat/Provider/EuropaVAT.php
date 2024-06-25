@@ -16,6 +16,9 @@ use stdClass;
 
 class EuropaVAT implements Providable
 {
+    protected const VAT_EU_COUNTRY_LIST = ['AT','BE','BG','CY','CZ','DE','DK','EE','EL','ES','FI','FR','HR','HU','IE','IT','LU','LV','LT','MT','NL','PL','PT','RO','SE','SI','SK','XI'];
+    private const COUNTRY_NOT_VALID = 'Country not valid in Europa VAT Service: %s';
+    
     public const EU_VAT_API = 'https://ec.europa.eu';
     public const EU_VAT_WSDL_ENDPOINT = '/taxation_customs/vies/checkVatService.wsdl';
 
@@ -60,6 +63,11 @@ class EuropaVAT implements Providable
      */
     public function getResource($sVatNumber, string $sCountryCode): stdClass
     {
+        if (!in_array(strtoupper($sCountryCode), self::VAT_EU_COUNTRY_LIST)) {
+            throw new Exception(
+                sprintf(self::COUNTRY_NOT_VALID, strtoupper($sCountryCode))
+            );
+        } 
         try {
             $aDetails = [
                 'countryCode' => strtoupper($sCountryCode),
