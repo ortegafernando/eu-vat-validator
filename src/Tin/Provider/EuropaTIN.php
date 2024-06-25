@@ -16,6 +16,9 @@ use stdClass;
 
 class EuropaTIN implements Providable
 {
+    protected const TIN_EU_COUNTRY_LIST = ['AT','BE','BG','CY','CZ','DE','DK','EE','EL','ES','FI','FR','HR','HU','IE','IT','LU','LV','LT','MT','NL','PL','PT','RO','SE','SI','SK'];
+    public const COUNTRY_NOT_VALID = 'Country not valid in Europa TIN Service: %s';
+    
     public const EU_TIN_API = 'https://ec.europa.eu';
     public const EU_TIN_WSDL_ENDPOINT = '/taxation_customs/tin/services/checkTinService.wsdl';
 
@@ -60,6 +63,11 @@ class EuropaTIN implements Providable
      */
     public function getResource($sTinNumber, string $sCountryCode): stdClass
     {
+        if (!in_array(strtoupper($sCountryCode), self::TIN_EU_COUNTRY_LIST)) {
+            throw new Exception(
+                sprintf(self::COUNTRY_NOT_VALID, strtoupper($sCountryCode))
+            );
+        }
         try {
             $aDetails = [
                 'countryCode' => strtoupper($sCountryCode),
